@@ -1,0 +1,13 @@
+# Python
+__pycache__/
+*.pyc
+*.pyo
+venv/
+*.sqlite3
+
+# Node
+node_modules/
+.next/
+
+# Environment files
+.env
