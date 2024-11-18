@@ -1,6 +1,7 @@
 'use client';
 
 import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
 
 const RegisterForm = () => {
   const [formData, setFormData] = useState({
@@ -9,8 +10,9 @@ const RegisterForm = () => {
     email: '',
     phone_number: '',
     password: '',
-    // Removed role from state
   });
+
+  const router = useRouter();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -34,8 +36,19 @@ const RegisterForm = () => {
 
       const result = await res.json();
       if (res.ok) {
+        // Registration successful
         console.log('Registration successful:', result);
-        // Redirect or show success message
+
+        // Save registration status in localStorage
+        localStorage.setItem('isRegistered', 'true');
+
+        // Fetch data from home API to confirm
+        const homeRes = await fetch('/api/home');
+        const homeData = await homeRes.json();
+        console.log('Home API Response:', homeData);
+
+        // Redirect to the home page
+        router.push('/');
       } else {
         console.error('Error:', result);
       }
