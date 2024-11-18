@@ -17,9 +17,14 @@ Including another URLconf
 from django.contrib import admin
 from django.urls import path
 
-from HELAI.backend import account_users
+from account_users import views
 
 urlpatterns = [
     path('admin/', admin.site.urls),
+    path('api/token/', views.LoginView.as_view(), name='token_obtain_pair'),
+    path('api/token/refresh/', views.TokenRefreshView.as_view(), name='token_refresh'),
+    path('api/register/', views.RegisterView.as_view(), name='register'),
+    path('api/hello/', views.HelloWorldView.as_view(), name='hello_world'),
+    
    
 ]
