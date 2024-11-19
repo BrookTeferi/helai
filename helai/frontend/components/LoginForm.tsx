@@ -27,7 +27,7 @@ const LoginForm = () => {
     setErrorMessage('');
 
     try {
-      const res = await fetch('/api/login', {
+      const res = await fetch('/account_users/login', {
         method: 'POST',
         headers: {
           'Content-Type': 'application/json',

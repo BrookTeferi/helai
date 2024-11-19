@@ -1,140 +1,146 @@
-'use client';
+'use client'
 
-import React, { useState } from 'react';
-import { useRouter } from 'next/navigation';
-
-const RegisterForm = () => {
+import React, { useState } from 'react'
+import { useRouter } from 'next/navigation'
+import Link from 'next/link'
+import { Eye, EyeOff } from 'lucide-react'
+import { Button } from './ui/button'
+import { Checkbox } from './ui/checkbox'
+import { Input } from './ui/input'
+export default function RegisterForm() {
   const [formData, setFormData] = useState({
+    name: '',
     email: '',
     password: '',
-    first_name: '',
-    last_name: '',
-  });
-
-  const [errorMessage, setErrorMessage] = useState('');
-  const router = useRouter();
+    confirmPassword: '',
+  })
+  const [showPassword, setShowPassword] = useState(false)
+  const [errorMessage, setErrorMessage] = useState('')
+  const router = useRouter()
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target;
-    setFormData({
-      ...formData,
-      [name]: value,
-    });
-  };
+    const { name, value } = e.target
+    setFormData(prev => ({ ...prev, [name]: value }))
+  }
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-
-    // Clear previous error message
-    setErrorMessage('');
+    e.preventDefault()
+    setErrorMessage('')
 
     try {
-      const res = await fetch('/api/register', {
+      const res = await fetch('/account_users/register', {
         method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-        },
+        headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
-      });
+      })
 
-      const result = await res.json();
+      const result = await res.json()
 
       if (res.ok) {
-        // If registration is successful
-        localStorage.setItem('userCreated', 'true'); // Store the success flag
-        router.push('/login'); // Redirect to the login page
+        localStorage.setItem('userCreated', 'true')
+        router.push('/login')
       } else {
-        // If registration failed, show error message
-        setErrorMessage(result.message || 'Registration failed. Please try again.');
+        setErrorMessage(result.message || 'Registration failed. Please try again.')
       }
     } catch (error) {
-      console.error('Error submitting form:', error);
-      setErrorMessage('An error occurred. Please try again.');
+      console.error('Error submitting form:', error)
+      setErrorMessage('An error occurred. Please try again.')
     }
-  };
+  }
 
   return (
-    <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500">
-      <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-lg">
-        <h2 className="text-2xl font-semibold text-center text-gray-800">Create Your Account</h2>
-
-        {/* Show error message */}
-        {errorMessage && (
-          <div className="text-red-600 text-sm mt-2">
-            {errorMessage}
-          </div>
-        )}
-
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-600/20 via-teal-500/20 to-purple-600/20">
+      <div className="absolute inset-0 -z-10">
+        <img
+          src="/placeholder.svg?height=1080&width=1920"
+          alt="Background"
+          className="w-full h-full object-cover"
+        />
+        <div className="absolute inset-0 bg-gradient-to-br from-blue-600/40 via-teal-500/40 to-purple-600/40" />
+      </div>
+      
+      <div className="w-full max-w-md p-8 bg-white rounded-3xl shadow-xl">
+        <h1 className="text-2xl font-bold text-center mb-8">CREATE ACCOUNT</h1>
+        
         <form onSubmit={handleSubmit} className="space-y-6">
-          <div>
-            <label htmlFor="first_name" className="block text-sm font-medium text-gray-700">First Name</label>
-            <input
+          {errorMessage && (
+            <div className="text-red-600 text-sm text-center">
+              {errorMessage}
+            </div>
+          )}
+          
+          <div className="space-y-4">
+            <Input
               type="text"
-              id="first_name"
-              name="first_name"
-              value={formData.first_name}
+              name="name"
+              placeholder="Your Name"
+              value={formData.name}
               onChange={handleInputChange}
-              className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-              placeholder="John"
+              className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
             />
-          </div>
-
-          <div>
-            <label htmlFor="last_name" className="block text-sm font-medium text-gray-700">Last Name</label>
-            <input
-              type="text"
-              id="last_name"
-              name="last_name"
-              value={formData.last_name}
-              onChange={handleInputChange}
-              className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-              placeholder="Doe"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="email" className="block text-sm font-medium text-gray-700">Email</label>
-            <input
+            
+            <Input
               type="email"
-              id="email"
               name="email"
+              placeholder="Your Email"
               value={formData.email}
               onChange={handleInputChange}
-              className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-              placeholder="johndoe@example.com"
+              className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
             />
-          </div>
-
-          <div>
-            <label htmlFor="password" className="block text-sm font-medium text-gray-700">Password</label>
-            <input
-              type="password"
-              id="password"
-              name="password"
-              value={formData.password}
+            
+            <div className="relative">
+              <Input
+                type={showPassword ? 'text' : 'password'}
+                name="password"
+                placeholder="Password"
+                value={formData.password}
+                onChange={handleInputChange}
+                className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              />
+              <button
+                type="button"
+                onClick={() => setShowPassword(!showPassword)}
+                className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-500 hover:text-gray-700"
+              >
+                {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
+              </button>
+            </div>
+            
+            <Input
+              type={showPassword ? 'text' : 'password'}
+              name="confirmPassword"
+              placeholder="Repeat your password"
+              value={formData.confirmPassword}
               onChange={handleInputChange}
-              className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-              placeholder="********"
+              className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
             />
           </div>
 
-          <div className="flex items-center justify-between">
-            <button
-              type="submit"
-              className="w-full py-3 px-4 text-white bg-indigo-600 rounded-md hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-indigo-500"
-            >
-              Register
-            </button>
+          <div className="flex items-center space-x-2">
+            <Checkbox id="terms" className="rounded border-gray-300" />
+            <label htmlFor="terms" className="text-sm text-gray-600">
+              I agree all statements in{' '}
+              <Link href="/terms" className="text-blue-600 hover:underline">
+                Terms of service
+              </Link>
+            </label>
           </div>
-        </form>
 
-        <p className="text-center text-sm text-gray-600">
-          Already have an account?{' '}
-          <a href="/login" className="text-indigo-600 hover:text-indigo-700">Login here</a>
-        </p>
+          <Button
+            type="submit"
+            className="w-full py-3 rounded-lg bg-gradient-to-r from-blue-500 via-blue-600 to-teal-500 hover:from-blue-600 hover:via-blue-700 hover:to-teal-600 text-white font-medium transition-all duration-200"
+          >
+            SIGN UP
+          </Button>
+
+          <p className="text-center text-gray-600 text-sm">
+            Have already an account?{' '}
+            <Link href="/login" className="text-blue-600 hover:underline">
+              Login here
+            </Link>
+          </p>
+        </form>
       </div>
     </div>
-  );
-};
-
-export default RegisterForm;
+  )
+}
