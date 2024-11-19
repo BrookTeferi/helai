@@ -25,7 +25,7 @@ SECRET_KEY = 'django-insecure-brcp)b*5((e!t7#tkwo65!1k&#v!g49u0vipg^4fgpv4jq50p5
 # SECURITY WARNING: don't run with debug turned on in production!
 DEBUG = True
 
-ALLOWED_HOSTS = []
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -37,7 +37,7 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-     'rest_framework',
+    'rest_framework',
     'rest_framework_simplejwt',
     'corsheaders',
     'account_users',
@@ -59,6 +59,13 @@ MIDDLEWARE = [
 AUTH_USER_MODEL="account_users.User"
 ROOT_URLCONF = 'helai_be.urls'
 CORS_ALLOW_ALL_ORIGINS = True
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",  # Next.js frontend
+    "http://127.0.0.1:3000",  # In case you're using 127.0.0.1 for frontend
+]
+
+
 TEMPLATES = [
     {
         'BACKEND': 'django.template.backends.django.DjangoTemplates',
@@ -93,12 +100,12 @@ DATABASES = {
     }
 }
 
+
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': (
         'rest_framework_simplejwt.authentication.JWTAuthentication',
     ),
 }
-
 SIMPLE_JWT = {
     'ACCESS_TOKEN_LIFETIME': timedelta(minutes=5),
     'REFRESH_TOKEN_LIFETIME': timedelta(days=1),

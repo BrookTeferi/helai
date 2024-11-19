@@ -5,13 +5,13 @@ import { useRouter } from 'next/navigation';
 
 const RegisterForm = () => {
   const [formData, setFormData] = useState({
+    email: '',
+    password: '',
     first_name: '',
     last_name: '',
-    email: '',
-    phone_number: '',
-    password: '',
   });
 
+  const [errorMessage, setErrorMessage] = useState('');
   const router = useRouter();
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -25,6 +25,9 @@ const RegisterForm = () => {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
 
+    // Clear previous error message
+    setErrorMessage('');
+
     try {
       const res = await fetch('/api/register', {
         method: 'POST',
@@ -35,32 +38,33 @@ const RegisterForm = () => {
       });
 
       const result = await res.json();
+
       if (res.ok) {
-        // Registration successful
-        console.log('Registration successful:', result);
-
-        // Save registration status in localStorage
-        localStorage.setItem('isRegistered', 'true');
-
-        // Fetch data from home API to confirm
-        const homeRes = await fetch('/api/home');
-        const homeData = await homeRes.json();
-        console.log('Home API Response:', homeData);
-
-        // Redirect to the home page
-        router.push('/');
+        // If registration is successful
+        localStorage.setItem('userCreated', 'true'); // Store the success flag
+        router.push('/login'); // Redirect to the login page
       } else {
-        console.error('Error:', result);
+        // If registration failed, show error message
+        setErrorMessage(result.message || 'Registration failed. Please try again.');
       }
     } catch (error) {
       console.error('Error submitting form:', error);
+      setErrorMessage('An error occurred. Please try again.');
     }
   };
 
   return (
     <div className="flex items-center justify-center min-h-screen bg-gradient-to-r from-indigo-500 via-purple-600 to-pink-500">
       <div className="w-full max-w-md p-8 space-y-6 bg-white rounded-lg shadow-lg">
-        <h2 className="text-2xl font-semibold text-center text-gray-800">Create an Account</h2>
+        <h2 className="text-2xl font-semibold text-center text-gray-800">Create Your Account</h2>
+
+        {/* Show error message */}
+        {errorMessage && (
+          <div className="text-red-600 text-sm mt-2">
+            {errorMessage}
+          </div>
+        )}
+
         <form onSubmit={handleSubmit} className="space-y-6">
           <div>
             <label htmlFor="first_name" className="block text-sm font-medium text-gray-700">First Name</label>
@@ -98,19 +102,6 @@ const RegisterForm = () => {
               onChange={handleInputChange}
               className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
               placeholder="johndoe@example.com"
-            />
-          </div>
-
-          <div>
-            <label htmlFor="phone_number" className="block text-sm font-medium text-gray-700">Phone Number</label>
-            <input
-              type="tel"
-              id="phone_number"
-              name="phone_number"
-              value={formData.phone_number}
-              onChange={handleInputChange}
-              className="mt-1 w-full p-3 border border-gray-300 rounded-md focus:outline-none focus:ring-2 focus:ring-indigo-500 focus:border-indigo-500"
-              placeholder="123-456-7890"
             />
           </div>
 
