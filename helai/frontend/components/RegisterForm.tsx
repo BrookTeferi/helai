@@ -4,9 +4,7 @@ import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Eye, EyeOff } from 'lucide-react'
-import { Button } from './ui/button'
-import { Checkbox } from './ui/checkbox'
-import { Input } from './ui/input'
+
 export default function RegisterForm() {
   const [formData, setFormData] = useState({
     name: '',
@@ -16,6 +14,7 @@ export default function RegisterForm() {
   })
   const [showPassword, setShowPassword] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
+  const [agreeTerms, setAgreeTerms] = useState(false)
   const router = useRouter()
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
@@ -26,6 +25,11 @@ export default function RegisterForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setErrorMessage('')
+
+    if (!agreeTerms) {
+      setErrorMessage('Please agree to the Terms of Service.')
+      return
+    }
 
     try {
       const res = await fetch('/account_users/register', {
@@ -70,32 +74,35 @@ export default function RegisterForm() {
           )}
           
           <div className="space-y-4">
-            <Input
+            <input
               type="text"
               name="name"
               placeholder="Your Name"
               value={formData.name}
               onChange={handleInputChange}
               className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              required
             />
             
-            <Input
+            <input
               type="email"
               name="email"
               placeholder="Your Email"
               value={formData.email}
               onChange={handleInputChange}
               className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              required
             />
             
             <div className="relative">
-              <Input
+              <input
                 type={showPassword ? 'text' : 'password'}
                 name="password"
                 placeholder="Password"
                 value={formData.password}
                 onChange={handleInputChange}
                 className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+                required
               />
               <button
                 type="button"
@@ -106,18 +113,26 @@ export default function RegisterForm() {
               </button>
             </div>
             
-            <Input
+            <input
               type={showPassword ? 'text' : 'password'}
               name="confirmPassword"
               placeholder="Repeat your password"
               value={formData.confirmPassword}
               onChange={handleInputChange}
               className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              required
             />
           </div>
 
           <div className="flex items-center space-x-2">
-            <Checkbox id="terms" className="rounded border-gray-300" />
+            <input
+              type="checkbox"
+              id="terms"
+              checked={agreeTerms}
+              onChange={(e) => setAgreeTerms(e.target.checked)}
+              className="rounded border-gray-300"
+              required
+            />
             <label htmlFor="terms" className="text-sm text-gray-600">
               I agree all statements in{' '}
               <Link href="/terms" className="text-blue-600 hover:underline">
@@ -126,12 +141,12 @@ export default function RegisterForm() {
             </label>
           </div>
 
-          <Button
+          <button
             type="submit"
             className="w-full py-3 rounded-lg bg-gradient-to-r from-blue-500 via-blue-600 to-teal-500 hover:from-blue-600 hover:via-blue-700 hover:to-teal-600 text-white font-medium transition-all duration-200"
           >
             SIGN UP
-          </Button>
+          </button>
 
           <p className="text-center text-gray-600 text-sm">
             Have already an account?{' '}
