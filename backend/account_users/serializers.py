@@ -1,12 +1,10 @@
-from django.contrib.auth import authenticate  # Add this import
-from rest_framework import serializers
 from django.contrib.auth import get_user_model
-from django.core.exceptions import ValidationError
+from rest_framework import serializers
+from rest_framework.exceptions import ValidationError
 
-# Assuming you have a custom user model with 'role' as a choice field
 class RegisterSerializer(serializers.ModelSerializer):
     password = serializers.CharField(write_only=True)
-    role = serializers.ChoiceField(choices=['STUDENT', 'INSTRUCTOR'], required=False, default='STUDENT')  # Default role set to 'STUDENT'
+    role = serializers.ChoiceField(choices=['STUDENT', 'INSTRUCTOR'], required=False, default='STUDENT')
 
     class Meta:
         model = get_user_model()
@@ -35,36 +33,13 @@ class RegisterSerializer(serializers.ModelSerializer):
             raise ValidationError("This email address is already in use.")
         return value
 
-
-class UserSerializer(serializers.ModelSerializer):
-    """
-    Serializer for user data (for when we need to return user data).
-    """
-    class Meta:
-        model = get_user_model()
-        fields = ('id', 'email', 'first_name', 'last_name', 'role')
-
-
-class LoginSerializer(serializers.Serializer):
-    """
-    Serializer for login, expecting email and password.
-    """
-    email = serializers.EmailField()
-    password = serializers.CharField(write_only=True)
-
-    def validate(self, attrs):
+    def validate_username(self, value):
         """
-        Authenticate the user.
+        Check if the username is valid and unique.
         """
-        email = attrs.get('email')
-        password = attrs.get('password')
-
-        # Check if the user exists and authenticate using email instead of username
-        user_model = get_user_model()
-        user = user_model.objects.filter(email=email).first()
-
-        if user is None or not user.check_password(password):
-            raise ValidationError("Invalid email or password.")
-        
-        attrs['user'] = user
-        return attrs
+        username_pattern = r'^[a-zA-Z0-9@._+\-/_]+$'
+        if not re.match(username_pattern, value):
+            raise ValidationError("Username can only contain letters, numbers, and @/./+/-/_ characters.")
+        if get_user_model().objects.filter(username=value).exists():
+            raise ValidationError("This username is already taken.")
+        return value

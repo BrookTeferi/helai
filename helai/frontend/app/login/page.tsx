@@ -1,8 +1,10 @@
-import LoginForm from '../../components/LoginForm';
+// app/login/page.tsx
+import LoginForm from "@/components/auth/LoginForm";
 
 const LoginPage = () => {
   return (
-    <div>
+    <div className="page-container">
+      <h1>Login</h1>
       <LoginForm />
     </div>
   );

@@ -1,4 +1,5 @@
-const BASE_URL = 'http://127.0.0.1:8000/'; // Adjust this to match your backend URL
+// utils/api.ts
+const BASE_URL = 'http://127.0.0.1:8000/'; // Base URL for your backend API
 
 /**
  * A reusable function to handle API requests.
@@ -25,6 +26,7 @@ export const apiRequest = async (
     },
   };
 
+  // Attach body if provided (for POST requests like registration and login)
   if (body) {
     options.body = JSON.stringify(body);
   }
@@ -32,15 +34,20 @@ export const apiRequest = async (
   try {
     const response = await fetch(url, options);
 
-    // Parse response
-    const data = await response.json();
-
-    // Handle HTTP errors
+    // Check if response status is not okay (not 2xx)
     if (!response.ok) {
-      throw new Error(data.message || 'Something went wrong');
+      const errorData = await response.json();
+      throw new Error(errorData.message || 'Something went wrong');
     }
 
-    return data;
+    // Try to parse JSON response, fallback to text if not JSON
+    try {
+      const data = await response.json();
+      return data;
+    } catch (error) {
+      const text = await response.text();
+      return { message: text };
+    }
   } catch (error: any) {
     console.error('API Request Error:', error.message);
     throw error;

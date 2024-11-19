@@ -4,76 +4,68 @@ import React, { useState } from 'react'
 import { useRouter } from 'next/navigation'
 import Link from 'next/link'
 import { Eye, EyeOff } from 'lucide-react'
+import { apiRequest } from '@/utils/api'
 
-export default function RegisterForm() {
+const RegisterForm = () => {
+  const router = useRouter()
   const [formData, setFormData] = useState({
-    name: '',
     email: '',
+    first_name: '',
+    last_name: '',
+    username: '',
     password: '',
-    confirmPassword: '',
+    role: 'STUDENT',
   })
-  const [showPassword, setShowPassword] = useState(false)
   const [errorMessage, setErrorMessage] = useState('')
   const [agreeTerms, setAgreeTerms] = useState(false)
-  const router = useRouter()
+  const [showPassword, setShowPassword] = useState(false) // For showing/hiding password input
 
-  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+  // Handle input changes
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target
     setFormData(prev => ({ ...prev, [name]: value }))
   }
 
+  // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
-    setErrorMessage('')
-  
+    setErrorMessage('') // Reset any previous error message
+
+    // Check if the user has agreed to the terms
     if (!agreeTerms) {
       setErrorMessage('Please agree to the Terms of Service.')
       return
     }
-  
+
     try {
-      const res = await fetch('/account_users/register', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(formData),
-      })
-  
-      // Check if the response is JSON
-      const contentType = res.headers.get('Content-Type')
-      if (res.ok) {
-        if (contentType && contentType.includes('application/json')) {
-          const result = await res.json()
-  
-          // Handle successful response
-          localStorage.setItem('userCreated', 'true')
-          router.push('/login')
-        } else {
-          // Handle non-JSON responses (like error pages)
-          const text = await res.text()
-          console.error('Non-JSON response:', text)
-          setErrorMessage('An unexpected error occurred. Please try again.')
-        }
-      } else {
-        // Handle HTTP errors (e.g., 404, 500)
-        const errorText = await res.text()
-        console.error('Error response:', errorText)
-        setErrorMessage('Registration failed. Please try again.')
+      // Make the API request to register the user
+      const response = await apiRequest('account_users/register/', 'POST', formData)
+
+      if (response) {
+        console.log('Registration successful', response)
+        localStorage.setItem('userCreated', 'true') // Store a flag indicating user was created
+        router.push('/login') // Redirect to login page
       }
     } catch (error) {
       console.error('Error submitting form:', error)
-      setErrorMessage('An error occurred. Please try again.')
+      setErrorMessage('Registration failed. Please try again.') // Display error message
     }
-  } 
+  }
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-600/20 via-teal-500/20 to-purple-600/20 bg-cover bg-center" style={{ backgroundImage: 'url(/images/background-image.jpg)' }}>
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-600/20 via-teal-500/20 to-purple-600/20">
       <div className="absolute inset-0 -z-10">
+        <img
+          src="/placeholder.svg?height=1080&width=1920"
+          alt="Background"
+          className="w-full h-full object-cover"
+        />
         <div className="absolute inset-0 bg-gradient-to-br from-blue-600/40 via-teal-500/40 to-purple-600/40" />
       </div>
 
       <div className="w-full max-w-md p-8 bg-white rounded-3xl shadow-xl">
-        <h1 className="text-2xl font-bold text-center mb-8 pl-12">CREATE ACCOUNT</h1> {/* Added padding to move heading */}
-        
+        <h1 className="text-2xl font-bold text-center mb-8">CREATE ACCOUNT</h1>
+
         <form onSubmit={handleSubmit} className="space-y-6">
           {errorMessage && (
             <div className="text-red-600 text-sm text-center">
@@ -83,20 +75,40 @@ export default function RegisterForm() {
 
           <div className="space-y-4">
             <input
-              type="text"
-              name="name"
-              placeholder="Your Name"
-              value={formData.name}
+              type="email"
+              name="email"
+              placeholder="Your Email"
+              value={formData.email}
               onChange={handleInputChange}
               className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               required
             />
 
             <input
-              type="email"
-              name="email"
-              placeholder="Your Email"
-              value={formData.email}
+              type="text"
+              name="username"
+              placeholder="Username"
+              value={formData.username}
+              onChange={handleInputChange}
+              className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              required
+            />
+
+            <input
+              type="text"
+              name="first_name"
+              placeholder="First Name"
+              value={formData.first_name}
+              onChange={handleInputChange}
+              className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
+              required
+            />
+
+            <input
+              type="text"
+              name="last_name"
+              placeholder="Last Name"
+              value={formData.last_name}
               onChange={handleInputChange}
               className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               required
@@ -120,16 +132,6 @@ export default function RegisterForm() {
                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
             </div>
-
-            <input
-              type={showPassword ? 'text' : 'password'}
-              name="confirmPassword"
-              placeholder="Repeat your password"
-              value={formData.confirmPassword}
-              onChange={handleInputChange}
-              className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
-              required
-            />
           </div>
 
           <div className="flex items-center space-x-2">
@@ -157,7 +159,7 @@ export default function RegisterForm() {
           </button>
 
           <p className="text-center text-gray-600 text-sm">
-            Have already an account?{' '}
+            Already have an account?{' '}
             <Link href="/login" className="text-blue-600 hover:underline">
               Login here
             </Link>
@@ -167,3 +169,5 @@ export default function RegisterForm() {
     </div>
   )
 }
+
+export default RegisterForm

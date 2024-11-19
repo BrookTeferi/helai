@@ -1,33 +1,16 @@
-// app/api/login/route.ts
-
 import { NextResponse } from 'next/server';
+import { loginUser } from '../../../services/accountUsers';
 
 export async function POST(req: Request) {
-  try {
-    const { email, password } = await req.json();
+    const { username, password } = await req.json();
 
-    // For demonstration purposes, we use hardcoded values
-    // You can replace this with a database call to verify user credentials.
-    const storedEmail = 'johndoe@example.com';
-    const storedPassword = 'pass123';
-
-    if (email === storedEmail && password === storedPassword) {
-      // Login successful
-      return NextResponse.json({
-        message: 'Login successful!',
-        status: 'success',
-      });
-    } else {
-      // Invalid credentials
-      return NextResponse.json({
-        message: 'Invalid email or password',
-        status: 'error',
-      }, { status: 400 });
+    try {
+        const user = await loginUser(username, password);
+        if (!user) {
+            return NextResponse.json({ error: 'Invalid credentials' }, { status: 400 });
+        }
+        return NextResponse.json({ message: 'Login successful', user });
+    } catch (error) {
+        return NextResponse.json({ error: 'Something went wrong' }, { status: 500 });
     }
-  } catch (error) {
-    return NextResponse.json({
-      message: 'An error occurred during login',
-      status: 'error',
-    }, { status: 500 });
-  }
 }

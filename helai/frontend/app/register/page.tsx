@@ -1,10 +1,11 @@
 // app/register/page.tsx
-import RegisterForm from '../../components/RegisterForm';
+import RegisterForm from "@/components/auth/RegisterForm";
 
 const RegisterPage = () => {
   return (
-    <div>
-     <RegisterForm />
+    <div className="page-container">
+      <h1>Register</h1>
+      <RegisterForm />
     </div>
   );
 };
