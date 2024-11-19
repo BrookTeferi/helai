@@ -25,46 +25,54 @@ export default function RegisterForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault()
     setErrorMessage('')
-
+  
     if (!agreeTerms) {
       setErrorMessage('Please agree to the Terms of Service.')
       return
     }
-
+  
     try {
       const res = await fetch('/account_users/register', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         body: JSON.stringify(formData),
       })
-
-      const result = await res.json()
-
+  
+      // Check if the response is JSON
+      const contentType = res.headers.get('Content-Type')
       if (res.ok) {
-        localStorage.setItem('userCreated', 'true')
-        router.push('/login')
+        if (contentType && contentType.includes('application/json')) {
+          const result = await res.json()
+  
+          // Handle successful response
+          localStorage.setItem('userCreated', 'true')
+          router.push('/login')
+        } else {
+          // Handle non-JSON responses (like error pages)
+          const text = await res.text()
+          console.error('Non-JSON response:', text)
+          setErrorMessage('An unexpected error occurred. Please try again.')
+        }
       } else {
-        setErrorMessage(result.message || 'Registration failed. Please try again.')
+        // Handle HTTP errors (e.g., 404, 500)
+        const errorText = await res.text()
+        console.error('Error response:', errorText)
+        setErrorMessage('Registration failed. Please try again.')
       }
     } catch (error) {
       console.error('Error submitting form:', error)
       setErrorMessage('An error occurred. Please try again.')
     }
-  }
+  } 
 
   return (
-    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-600/20 via-teal-500/20 to-purple-600/20">
+    <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-600/20 via-teal-500/20 to-purple-600/20 bg-cover bg-center" style={{ backgroundImage: 'url(/images/background-image.jpg)' }}>
       <div className="absolute inset-0 -z-10">
-        <img
-          src="/placeholder.svg?height=1080&width=1920"
-          alt="Background"
-          className="w-full h-full object-cover"
-        />
         <div className="absolute inset-0 bg-gradient-to-br from-blue-600/40 via-teal-500/40 to-purple-600/40" />
       </div>
-      
+
       <div className="w-full max-w-md p-8 bg-white rounded-3xl shadow-xl">
-        <h1 className="text-2xl font-bold text-center mb-8">CREATE ACCOUNT</h1>
+        <h1 className="text-2xl font-bold text-center mb-8 pl-12">CREATE ACCOUNT</h1> {/* Added padding to move heading */}
         
         <form onSubmit={handleSubmit} className="space-y-6">
           {errorMessage && (
@@ -72,7 +80,7 @@ export default function RegisterForm() {
               {errorMessage}
             </div>
           )}
-          
+
           <div className="space-y-4">
             <input
               type="text"
@@ -83,7 +91,7 @@ export default function RegisterForm() {
               className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               required
             />
-            
+
             <input
               type="email"
               name="email"
@@ -93,7 +101,7 @@ export default function RegisterForm() {
               className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               required
             />
-            
+
             <div className="relative">
               <input
                 type={showPassword ? 'text' : 'password'}
@@ -112,7 +120,7 @@ export default function RegisterForm() {
                 {showPassword ? <EyeOff size={20} /> : <Eye size={20} />}
               </button>
             </div>
-            
+
             <input
               type={showPassword ? 'text' : 'password'}
               name="confirmPassword"
