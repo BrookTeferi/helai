@@ -1,70 +1,63 @@
-'use client'
+// Add this line at the top of your LoginForm.tsx file
+'use client';
 
-import React, { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
-import { Eye, EyeOff } from 'lucide-react'
-import { apiRequest } from '@/utils/api'
-import { toast, ToastContainer } from 'react-toastify'
-import 'react-toastify/dist/ReactToastify.css'
+import React, { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import Link from 'next/link';
+import { Eye, EyeOff } from 'lucide-react';
+import { apiRequest } from '@/utils/api';
+
+// Your LoginForm component code here
+
+import { ToastContainer, toast } from 'react-toastify';
+import 'react-toastify/dist/ReactToastify.css';
 
 export default function LoginForm() {
   const [formData, setFormData] = useState({
     username: '',
     password: '',
-  })
-  const [showPassword, setShowPassword] = useState(false)
-  const [isSubmitting, setIsSubmitting] = useState(false)
-  const router = useRouter()
+  });
+  const [showPassword, setShowPassword] = useState(false);
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const router = useRouter();
+
+  useEffect(() => {
+    // Testing toast on component mount
+    toast.success('Toast is working!', {
+      position: 'top-center',  // Correct position usage as string
+      autoClose: 3000,
+      theme: 'colored',
+    });
+  }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
-    const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
-  }
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
 
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setIsSubmitting(true)
+    e.preventDefault();
+    setIsSubmitting(true);
 
     try {
-      const response = await apiRequest('account_users/login/', 'POST', formData)
-      console.log('User ID:', response.id)
-      localStorage.setItem('accessToken', response.access)
-      localStorage.setItem('refreshToken', response.refresh)
-      router.push('/home')
+      const response = await apiRequest('account_users/login/', 'POST', formData);
+      console.log('User ID:', response.id);
+      localStorage.setItem('accessToken', response.access);
+      localStorage.setItem('refreshToken', response.refresh);
+      router.push('/home');
     } catch (error: any) {
-      console.error('Login error:', error.message)
+      console.error('Login error:', error.message);
 
-      // Displaying error messages with Toastify
-      if (error.message === 'Invalid username or password.') {
-        toast.error('Oops! Invalid username or password. Please try again.', {
-          position: toast.POSITION.TOP_CENTER,
-          autoClose: 5000,
-          theme: 'colored',
-        })
-      } else if (error.message === 'This account is inactive.') {
-        toast.warn('Your account is inactive. Please contact support.', {
-          position: toast.POSITION.TOP_CENTER,
-          autoClose: 5000,
-          theme: 'colored',
-        })
-      } else if (error.message === 'Network Error' || error.message === 'Failed to fetch') {
-        toast.error('Network error! Please check your internet connection or try again later.', {
-          position: toast.POSITION.TOP_CENTER,
-          autoClose: 5000,
-          theme: 'colored',
-        })
-      } else {
-        toast.error('An unexpected error occurred. Please try again later.', {
-          position: toast.POSITION.TOP_CENTER,
-          autoClose: 5000,
-          theme: 'colored',
-        })
-      }
+      // Triggering the error toast
+      toast.error('An unexpected error occurred. Please try again later.', {
+        position: 'top-center',  // Correct position usage as string
+        autoClose: 5000,
+        theme: 'colored',
+      });
     } finally {
-      setIsSubmitting(false)
+      setIsSubmitting(false);
     }
-  }
+  };
 
   return (
     <>
@@ -78,10 +71,10 @@ export default function LoginForm() {
           />
           <div className="absolute inset-0 bg-gradient-to-br from-blue-600/40 via-teal-500/40 to-purple-600/40" />
         </div>
-        
+
         <div className="w-full max-w-md p-8 bg-white rounded-3xl shadow-xl">
           <h1 className="text-2xl font-bold text-center mb-8">LOGIN</h1>
-          
+
           <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-4">
               <input
@@ -93,7 +86,7 @@ export default function LoginForm() {
                 className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
                 required
               />
-              
+
               <div className="relative">
                 <input
                   type={showPassword ? 'text' : 'password'}
@@ -132,5 +125,5 @@ export default function LoginForm() {
         </div>
       </div>
     </>
-  )
+  );
 }
