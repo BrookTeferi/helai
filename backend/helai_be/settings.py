@@ -62,7 +62,8 @@ CORS_ALLOW_ALL_ORIGINS = True
 
 CORS_ALLOWED_ORIGINS = [
     "http://localhost:3000",  # Next.js frontend
-    "http://127.0.0.1:3000",  # In case you're using 127.0.0.1 for frontend
+    "http://127.0.0.1:3000", 
+    "http://localhost:8080", # In case you're using 127.0.0.1 for frontend
 ]
 
 

@@ -1,8 +1,24 @@
-from django.contrib.auth import get_user_model
+import re
+from django.contrib.auth import get_user_model, authenticate
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
 
+# UserSerializer
+class UserSerializer(serializers.ModelSerializer):
+    """
+    Serializer for returning user details.
+    """
+    class Meta:
+        model = get_user_model()
+        fields = ('id', 'email', 'first_name', 'last_name', 'username', 'role')
+        read_only_fields = ('id', 'email', 'username', 'role')
+
+
+# RegisterSerializer
 class RegisterSerializer(serializers.ModelSerializer):
+    """
+    Serializer for user registration.
+    """
     password = serializers.CharField(write_only=True)
     role = serializers.ChoiceField(choices=['STUDENT', 'INSTRUCTOR'], required=False, default='STUDENT')
 
@@ -12,7 +28,7 @@ class RegisterSerializer(serializers.ModelSerializer):
 
     def create(self, validated_data):
         """
-        Create a new user with a default role if not provided.
+        Create a new user with the provided or default role.
         """
         role = validated_data.get('role', 'STUDENT')  # Default to 'STUDENT' if role is not provided
         user = get_user_model().objects.create_user(
@@ -43,3 +59,27 @@ class RegisterSerializer(serializers.ModelSerializer):
         if get_user_model().objects.filter(username=value).exists():
             raise ValidationError("This username is already taken.")
         return value
+
+
+class LoginSerializer(serializers.Serializer):
+    username = serializers.CharField()
+    password = serializers.CharField(write_only=True)
+
+    def validate(self, data):
+        username = data.get('username')
+        password = data.get('password')
+
+        # Validate the presence of username and password
+        if not username or not password:
+            raise ValidationError("Both username and password are required.")
+
+        # Authenticate the user
+        user = authenticate(username=username, password=password)
+
+        # Raise validation errors for invalid credentials or inactive accounts
+        if not user:
+            raise ValidationError("Invalid username or password.")
+        elif not user.is_active:
+            raise ValidationError("This account is inactive.")
+
+        return user  # Return the user object directly
