@@ -38,7 +38,7 @@ export default function LoginForm() {
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setIsSubmitting(true);
-
+  
     try {
       const response = await apiRequest('account_users/login/', 'POST', formData);
       console.log('User ID:', response.id);
@@ -47,10 +47,11 @@ export default function LoginForm() {
       router.push('/home');
     } catch (error: any) {
       console.error('Login error:', error.message);
-
-      // Triggering the error toast
-      toast.error('An unexpected error occurred. Please try again later.', {
-        position: 'top-center',  // Correct position usage as string
+      toast.dismiss();
+  
+      // Triggering the error toast with backend error message
+      toast.error(error.message || 'An unexpected error occurred. Please try again later.', {
+        position: 'top-center', // Correct position usage as a string
         autoClose: 5000,
         theme: 'colored',
       });

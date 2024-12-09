@@ -1,15 +1,4 @@
-// utils/api.ts
-const BASE_URL = 'http://127.0.0.1:8000/'; // Base URL for your backend API
-
-/**
- * A reusable function to handle API requests.
- * 
- * @param endpoint - The API endpoint (relative to the BASE_URL).
- * @param method - The HTTP method (e.g., 'GET', 'POST', etc.).
- * @param body - The request body (optional).
- * @param headers - Additional headers (optional).
- * @returns A promise resolving to the parsed JSON response or throwing an error.
- */
+const BASE_URL = 'http://127.0.0.1:8000/'; 
 export const apiRequest = async (
   endpoint: string,
   method: string,
@@ -26,7 +15,6 @@ export const apiRequest = async (
     },
   };
 
-  // Attach body if provided (for POST requests like registration and login)
   if (body) {
     options.body = JSON.stringify(body);
   }
@@ -36,20 +24,33 @@ export const apiRequest = async (
 
     // Check if response status is not okay (not 2xx)
     if (!response.ok) {
-      const errorData = await response.json();
-      throw new Error(errorData.message || 'Something went wrong');
+      let errorMessage = 'Something went wrong'; // Default error message
+
+      // Attempt to extract and parse the error message from the response
+      try {
+        const errorData = await response.json();
+        if (errorData.detail) {
+          errorMessage = errorData.detail; // Common field for DRF error messages
+        } else if (typeof errorData === 'object') {
+          errorMessage = JSON.stringify(errorData); // Handle structured errors
+        } else {
+          errorMessage = String(errorData); // Handle unexpected error formats
+        }
+      } catch (parseError) {
+        console.error('Error parsing response JSON:', parseError);
+      }
+
+      throw new Error(errorMessage); // Throw the extracted error message
     }
 
-    // Try to parse JSON response, fallback to text if not JSON
+    // Parse the successful response
     try {
-      const data = await response.json();
-      return data;
-    } catch (error) {
-      const text = await response.text();
-      return { message: text };
+      return await response.json();
+    } catch (jsonError) {
+      return { message: await response.text() }; // Fallback to text response
     }
   } catch (error: any) {
     console.error('API Request Error:', error.message);
-    throw error;
+    throw error; // Rethrow the error to be handled by the caller
   }
 };
