@@ -8,7 +8,8 @@ from rest_framework.response import Response
 from rest_framework.views import APIView
 from django.contrib.auth import authenticate
 from .serializers import RegisterSerializer, UserSerializer, LoginSerializer
-
+import logging
+logger = logging.getLogger(__name__)
 class RegisterView(APIView):
     def post(self, request):
         
@@ -20,6 +21,7 @@ class RegisterView(APIView):
 
 class LoginView(APIView):
     def post(self, request):
+        logger.debug(f"Request data: {request.data}")  # Log the incoming data
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.validated_data  # The user object returned from the serializer
@@ -29,6 +31,7 @@ class LoginView(APIView):
                 'refresh': str(refresh),
                 'access': str(refresh.access_token),
             }, status=status.HTTP_200_OK)
+        logger.error(f"Serializer errors: {serializer.errors}")  # Log the errors
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 class HelloWorldView(APIView):
     permission_classes = [IsAuthenticated]

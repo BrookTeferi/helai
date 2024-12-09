@@ -59,27 +59,22 @@ class RegisterSerializer(serializers.ModelSerializer):
         if get_user_model().objects.filter(username=value).exists():
             raise ValidationError("This username is already taken.")
         return value
-
-
 class LoginSerializer(serializers.Serializer):
     username = serializers.CharField()
     password = serializers.CharField(write_only=True)
 
-    def validate(self, data):
-        username = data.get('username')
-        password = data.get('password')
+    def validate(self, attrs):  # Use 'attrs' instead of 'data'
+        username = attrs.get('username')
+        password = attrs.get('password')
 
-        # Validate the presence of username and password
         if not username or not password:
-            raise ValidationError("Both username and password are required.")
+            raise ValidationError({"detail": "Both username and password are required."})
 
-        # Authenticate the user
         user = authenticate(username=username, password=password)
 
-        # Raise validation errors for invalid credentials or inactive accounts
         if not user:
-            raise ValidationError("Invalid username or password.")
+            raise ValidationError({"detail": "Invalid username or password."})
         elif not user.is_active:
-            raise ValidationError("This account is inactive.")
+            raise ValidationError({"detail": "This account is inactive."})
 
-        return user  # Return the user object directly
+        return user  # Return the user object
