@@ -21,14 +21,14 @@ export default function LoginForm() {
   const [isSubmitting, setIsSubmitting] = useState(false);
   const router = useRouter();
 
-  useEffect(() => {
-    // Testing toast on component mount
-    toast.success('Toast is working!', {
-      position: 'top-center',  // Correct position usage as string
-      autoClose: 3000,
-      theme: 'colored',
-    });
-  }, []);
+  // useEffect(() => {
+  //   // Testing toast on component mount
+  //   toast.success('Toast is working!', {
+  //     position: 'top-center',  // Correct position usage as string
+  //     autoClose: 3000,
+  //     theme: 'colored',
+  //   });
+  // }, []);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
@@ -46,7 +46,6 @@ export default function LoginForm() {
       localStorage.setItem('refreshToken', response.refresh);
       router.push('/home');
     } catch (error: any) {
-      console.error('Login error:', error.message);
       toast.dismiss();
   
       // Triggering the error toast with backend error message

@@ -19,7 +19,7 @@ export default function Hero() {
             </p>
             <div className="mt-8 flex flex-wrap gap-x-6 gap-y-4">
               <Link
-                href="/auth/register"
+                href="/register"
                 className="inline-flex items-center justify-center rounded-full bg-gradient-to-r from-blue-600 to-purple-600 px-6 py-3 text-lg font-semibold text-white shadow-sm hover:from-blue-700 hover:to-purple-700 focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-blue-600"
               >
                 Start Your Journey
@@ -68,7 +68,7 @@ export default function Hero() {
             </div>
             <div className="relative">
               <Image
-                src="/images/hero-image.jpg"
+                src="/images/hero.jpg"
                 alt="HELAI Platform"
                 width={1000}
                 height={700}
