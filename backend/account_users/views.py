@@ -37,3 +37,31 @@ class HelloWorldView(APIView):
 
     def get(self, request):
         return Response({"message": "Hello, World!"})
+    
+class OnboardingDashboardView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+        if user.role == 'STUDENT' and user.onboarding_status == 'NOT_STARTED':
+            return Response({
+                "welcome_message": f"Welcome to Helai, {user.first_name or user.username}!",
+                "next_steps": [
+                    "Complete your profile",
+                    "Take the knowledge assessment",
+                    "Enroll in your first course",
+                    "Explore the dashboard",
+                    "Start learning"
+                ],
+                "onboarding_status": user.onboarding_status,
+            })
+        elif user.onboarding_status == 'IN_PROGRESS':
+            return Response({
+                "message": "You're making great progress!",
+                "onboarding_status": user.onboarding_status,
+            })
+        else:
+            return Response({
+                "message": "Welcome back!",
+                "onboarding_status": user.onboarding_status,
+            })

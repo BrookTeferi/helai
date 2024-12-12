@@ -1,6 +1,6 @@
 from django.urls import path
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
-from .views import RegisterView, LoginView, HelloWorldView
+from .views import OnboardingDashboardView, RegisterView, LoginView, HelloWorldView
 
 urlpatterns = [
     # Token-related views for JWT authentication
@@ -13,4 +13,5 @@ urlpatterns = [
 
     # A simple view to return a greeting message (authenticated users only)
     path('api/hello/', HelloWorldView.as_view(), name='hello_world'),
+    path('onboarding-dashboard/', OnboardingDashboardView.as_view(), name='onboarding_dashboard'),
 ]
