@@ -11,7 +11,7 @@ const testimonials = [
     },
   },
   {
-    body: 'As a medical educator, I\'ve seen a significant improvement in student engagement and performance since implementing HELAI in our curriculum.',
+    body: 'As a medical educator, I\'ve witnessed a remarkable transformation in student engagement and performance since integrating HELAI into our curriculum. The interactive tools have truly enhanced the learning experience.',
     author: {
       name: 'Prof. Michael Johnson',
       handle: 'mjohnson',
@@ -20,7 +20,7 @@ const testimonials = [
     },
   },
   {
-    body: 'The collaborative features and mentorship network on HELAI have been invaluable in my journey to becoming a better healthcare professional.',
+    body: 'The mentorship network on HELAI has been a game changer for me. Connecting with experienced professionals has enriched my understanding of the medical field and boosted my confidence.',
     author: {
       name: 'Sarah Thompson',
       handle: 'sthompson',
@@ -28,6 +28,33 @@ const testimonials = [
       role: 'Medical Student',
     },
   },
+  {
+    body: 'HELAI\'s collaborative features have streamlined our group projects, allowing us to share insights and learn from one another more effectively. It\'s a fantastic resource for aspiring healthcare providers.',
+    author: {
+      name: 'Dr. Emily Carter',
+      handle: 'ecarter',
+      imageUrl: '/placeholder.svg?height=96&width=96',
+      role: 'Resident Physician',
+    },
+  },
+  {
+    body: 'The platform\'s focus on real-world applications has made my studies much more relevant. I feel better prepared for clinical practice thanks to HELAI\'s practical resources.',
+    author: {
+      name: 'James Lee',
+      handle: 'jlee',
+      imageUrl: '/placeholder.svg?height=96&width=96',
+      role: 'Medical Student',
+    },
+  },
+  {
+    body: 'HELAI has significantly improved our educational approach. The data-driven insights help us tailor our teaching methods to meet students\' needs, resulting in better outcomes.',
+    author: {
+      name: 'Dr. Lisa Patel',
+      handle: 'lpatel',
+      imageUrl: '/placeholder.svg?height=96&width=96',
+      role: 'Attending Physician',
+    },
+  }
 ]
 
 export default function Testimonials() {
