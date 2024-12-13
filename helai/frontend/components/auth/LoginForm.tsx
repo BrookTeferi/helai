@@ -44,7 +44,7 @@ export default function LoginForm() {
       console.log('User ID:', response.id);
       localStorage.setItem('accessToken', response.access);
       localStorage.setItem('refreshToken', response.refresh);
-      router.push('/home');
+      router.push('/dashboard');
     } catch (error: any) {
       toast.dismiss();
   

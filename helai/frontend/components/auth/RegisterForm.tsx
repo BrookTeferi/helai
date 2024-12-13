@@ -44,7 +44,7 @@ const RegisterForm = () => {
       if (response) {
         console.log('Registration successful', response)
         localStorage.setItem('userCreated', 'true') // Store a flag indicating user was created
-        router.push('/login') // Redirect to login page
+        router.push('/dashboard/new')
       }
     } catch (error) {
       console.error('Error submitting form:', error)
