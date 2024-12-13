@@ -11,26 +11,29 @@ import logging
 logger = logging.getLogger(__name__)
 class RegisterView(APIView):
     def post(self, request):
-        
         serializer = RegisterSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.save()
-            return Response({"user": UserSerializer(user).data}, status=status.HTTP_201_CREATED)
+            return Response({
+                "user": UserSerializer(user).data,
+                "is_registering": True  # Inform the frontend about the registration
+            }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
 class LoginView(APIView):
     def post(self, request):
-        logger.debug(f"Request data: {request.data}")  # Log the incoming data
+        logger.debug(f"Request data: {request.data}")
         serializer = LoginSerializer(data=request.data)
         if serializer.is_valid():
             user = serializer.validated_data  # The user object returned from the serializer
-            refresh = RefreshToken.for_user(user)  # Generate tokens for the user
+            refresh = RefreshToken.for_user(user)
             return Response({
-                'id': user.id,  # Include the user ID in the response
+                'id': user.id,
                 'refresh': str(refresh),
                 'access': str(refresh.access_token),
+                "is_logging_in": True  # Inform the frontend about the login
             }, status=status.HTTP_200_OK)
-        logger.error(f"Serializer errors: {serializer.errors}")  # Log the errors
+        logger.error(f"Serializer errors: {serializer.errors}")
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 class HelloWorldView(APIView):
     permission_classes = [IsAuthenticated]

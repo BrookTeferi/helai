@@ -1,13 +1,12 @@
-'use client'
-
-import React, { useState } from 'react'
-import { useRouter } from 'next/navigation'
-import Link from 'next/link'
-import { Eye, EyeOff } from 'lucide-react'
-import { apiRequest } from '@/utils/api'
+'use client';
+import React, { useState } from 'react';
+import { useRouter } from 'next/navigation';
+import { apiRequest } from '@/utils/api';
+import Link from 'next/link';  // Add Link import for the "Terms of Service" link
+import { Eye, EyeOff } from 'react-feather'; // Add icons for password visibility toggle
 
 const RegisterForm = () => {
-  const router = useRouter()
+  const router = useRouter();
   const [formData, setFormData] = useState({
     email: '',
     first_name: '',
@@ -15,42 +14,36 @@ const RegisterForm = () => {
     username: '',
     password: '',
     role: 'STUDENT',
-  })
-  const [errorMessage, setErrorMessage] = useState('')
-  const [agreeTerms, setAgreeTerms] = useState(false)
-  const [showPassword, setShowPassword] = useState(false) // For showing/hiding password input
+  });
+  const [errorMessage, setErrorMessage] = useState('');
+  const [agreeTerms, setAgreeTerms] = useState(false);
+  const [showPassword, setShowPassword] = useState(false);  // Define the showPassword state
 
-  // Handle input changes
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
-    const { name, value } = e.target
-    setFormData(prev => ({ ...prev, [name]: value }))
-  }
+    const { name, value } = e.target;
+    setFormData(prev => ({ ...prev, [name]: value }));
+  };
 
-  // Handle form submission
   const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault()
-    setErrorMessage('') // Reset any previous error message
+    e.preventDefault();
+    setErrorMessage('');
 
-    // Check if the user has agreed to the terms
     if (!agreeTerms) {
-      setErrorMessage('Please agree to the Terms of Service.')
-      return
+      setErrorMessage('Please agree to the Terms of Service.');
+      return;
     }
 
     try {
-      // Make the API request to register the user
-      const response = await apiRequest('account_users/register/', 'POST', formData)
+      const response = await apiRequest('account_users/register/', 'POST', formData);
 
-      if (response) {
-        console.log('Registration successful', response)
-        localStorage.setItem('userCreated', 'true') // Store a flag indicating user was created
-        router.push('/dashboard/new')
+      if (response.is_registering) {
+        router.push('/dashboard/new');
       }
     } catch (error) {
-      console.error('Error submitting form:', error)
-      setErrorMessage('Registration failed. Please try again.') // Display error message
+      console.error('Error submitting form:', error);
+      setErrorMessage('Registration failed. Please try again.');
     }
-  }
+  };
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-gradient-to-br from-blue-600/20 via-teal-500/20 to-purple-600/20">
@@ -167,7 +160,7 @@ const RegisterForm = () => {
         </form>
       </div>
     </div>
-  )
+  );
 }
 
-export default RegisterForm
+export default RegisterForm;
