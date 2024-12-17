@@ -2,8 +2,8 @@
 import React, { useState } from 'react';
 import { useRouter } from 'next/navigation';
 import { apiRequest } from '@/utils/api';
-import Link from 'next/link';  // Add Link import for the "Terms of Service" link
-import { Eye, EyeOff } from 'react-feather'; // Add icons for password visibility toggle
+import Link from 'next/link';
+import { Eye, EyeOff } from 'react-feather';
 
 const RegisterForm = () => {
   const router = useRouter();
@@ -17,11 +17,11 @@ const RegisterForm = () => {
   });
   const [errorMessage, setErrorMessage] = useState('');
   const [agreeTerms, setAgreeTerms] = useState(false);
-  const [showPassword, setShowPassword] = useState(false);  // Define the showPassword state
+  const [showPassword, setShowPassword] = useState(false);
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement | HTMLSelectElement>) => {
     const { name, value } = e.target;
-    setFormData(prev => ({ ...prev, [name]: value }));
+    setFormData((prev) => ({ ...prev, [name]: value }));
   };
 
   const handleSubmit = async (e: React.FormEvent) => {
@@ -34,14 +34,14 @@ const RegisterForm = () => {
     }
 
     try {
-      const response = await apiRequest('account_users/register/', 'POST', formData);
+      const response = await apiRequest('/api/register/', 'POST', formData);
 
       if (response.is_registering) {
-        router.push('/dashboard/new');
+        router.push('/dashboard');
       }
-    } catch (error) {
+    } catch (error: any) {
       console.error('Error submitting form:', error);
-      setErrorMessage('Registration failed. Please try again.');
+      setErrorMessage(error.message || 'Registration failed. Please try again.');
     }
   };
 
@@ -61,9 +61,7 @@ const RegisterForm = () => {
 
         <form onSubmit={handleSubmit} className="space-y-6">
           {errorMessage && (
-            <div className="text-red-600 text-sm text-center">
-              {errorMessage}
-            </div>
+            <div className="text-red-600 text-sm text-center">{errorMessage}</div>
           )}
 
           <div className="space-y-4">
@@ -76,7 +74,6 @@ const RegisterForm = () => {
               className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               required
             />
-
             <input
               type="text"
               name="username"
@@ -86,7 +83,6 @@ const RegisterForm = () => {
               className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               required
             />
-
             <input
               type="text"
               name="first_name"
@@ -96,7 +92,6 @@ const RegisterForm = () => {
               className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               required
             />
-
             <input
               type="text"
               name="last_name"
@@ -106,7 +101,6 @@ const RegisterForm = () => {
               className="w-full px-4 py-3 rounded-lg border border-gray-200 focus:ring-2 focus:ring-blue-500 focus:border-transparent transition-all"
               required
             />
-
             <div className="relative">
               <input
                 type={showPassword ? 'text' : 'password'}
@@ -137,9 +131,9 @@ const RegisterForm = () => {
               required
             />
             <label htmlFor="terms" className="text-sm text-gray-600">
-              I agree all statements in{' '}
+              I agree to all statements in{' '}
               <Link href="/terms" className="text-blue-600 hover:underline">
-                Terms of service
+                Terms of Service
               </Link>
             </label>
           </div>
@@ -161,6 +155,6 @@ const RegisterForm = () => {
       </div>
     </div>
   );
-}
+};
 
 export default RegisterForm;
