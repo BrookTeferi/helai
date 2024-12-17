@@ -50,9 +50,9 @@ class UserDetailsView(APIView):
         user = request.user
         data = {
             "userName": user.username,
-            "isNewUser": user.profile_completion < 100,  # Example logic
+            "isNewUser": user.onboarding_status != 'COMPLETED',
             "onboardingStatus": "Incomplete",
-            "profileCompletion": 50  # Placeholder value
+            "profileCompletion": 50 
         }
         return Response(data)
 class OnboardingDashboardView(APIView):

@@ -27,10 +27,12 @@ const LoginForm = () => {
 
     try {
       const response = await apiRequest('api/login/', 'POST', formData);
+      console.log('Login Response:', response);
       
-      if (response.accessToken && response.refreshToken) {
-        localStorage.setItem('accessToken', response.accessToken);
-        localStorage.setItem('refreshToken', response.refreshToken);
+      if (response.access && response.refresh) {
+        localStorage.setItem('accessToken', response.access);
+        localStorage.setItem('refreshToken', response.refresh);
+        console.log('Login successful');
         router.push('/dashboard');
       } else {
         setErrorMessage('Login failed. Please try again.');

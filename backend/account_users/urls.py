@@ -13,6 +13,6 @@ urlpatterns = [
     path('login/', LoginView.as_view(), name='login'),
 
     # A simple view to return a greeting message (authenticated users only)
-    # path('api/user/', UserDetailsView.as_view(), name='user_details'),
+    path('api/user/', UserDetailsView.as_view(), name='user_details'),
     path('onboarding-dashboard/', OnboardingDashboardView.as_view(), name='onboarding_dashboard'),
 ]
