@@ -2,15 +2,19 @@ from rest_framework import status
 from rest_framework.response import Response
 from rest_framework.views import APIView
 from rest_framework_simplejwt.tokens import RefreshToken
-from rest_framework.permissions import IsAuthenticated
+from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.decorators import api_view
-from rest_framework.response import Response
-from rest_framework.views import APIView
-from rest_framework.permissions import AllowAny
 from django.contrib.auth import authenticate
 from .serializers import RegisterSerializer, UserSerializer, LoginSerializer
 import logging
+
 logger = logging.getLogger(__name__)
+
+ONBOARDING_NOT_STARTED = 'NOT_STARTED'
+ONBOARDING_IN_PROGRESS = 'IN_PROGRESS'
+ONBOARDING_COMPLETED = 'COMPLETED'
+ROLE_STUDENT = 'STUDENT'
+
 class RegisterView(APIView):
     permission_classes = [AllowAny]
 
@@ -40,29 +44,32 @@ class LoginView(APIView):
             }, status=status.HTTP_200_OK)
         logger.error(f"Serializer errors: {serializer.errors}")
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-
 
 class UserDetailsView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
         user = request.user
+        profile_fields = ['first_name', 'last_name', 'email', 'profile_picture', 'bio']
+        completed_fields = sum(1 for field in profile_fields if getattr(user, field))
+        total_fields = len(profile_fields)
+        profile_completion = int((completed_fields / total_fields) * 100)
+
         data = {
             "userName": user.username,
-            "isNewUser": user.onboarding_status != 'COMPLETED',
-            "onboardingStatus": "Incomplete",
-            "profileCompletion": 50 
+            "isNewUser": user.onboarding_status != ONBOARDING_COMPLETED,
+            "profileCompletion": profile_completion
         }
-        return Response(data)
+        return Response(data, status=status.HTTP_200_OK)
+
 class OnboardingDashboardView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
         user = request.user
-        if user.role == 'STUDENT' and user.onboarding_status == 'NOT_STARTED':
+        if user.role == ROLE_STUDENT and user.onboarding_status == ONBOARDING_NOT_STARTED:
             return Response({
-                "welcome_message": f"Welcome to Helai, {user.first_name or user.username}!",
+                "message": f"Welcome to Helai, {user.first_name or user.username}!",
                 "next_steps": [
                     "Complete your profile",
                     "Take the knowledge assessment",
@@ -72,7 +79,7 @@ class OnboardingDashboardView(APIView):
                 ],
                 "onboarding_status": user.onboarding_status,
             })
-        elif user.onboarding_status == 'IN_PROGRESS':
+        elif user.onboarding_status == ONBOARDING_IN_PROGRESS:
             return Response({
                 "message": "You're making great progress!",
                 "onboarding_status": user.onboarding_status,
