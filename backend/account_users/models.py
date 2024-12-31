@@ -47,4 +47,8 @@ class User(AbstractUser):
     
 
 
-    
+class Role(models.Model):
+    name = models.CharField(max_length=50, unique=True)  # Role name (e.g., "Medical Student")
+
+    def __str__(self):
+        return self.name
