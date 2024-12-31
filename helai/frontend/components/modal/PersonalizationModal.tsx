@@ -1,15 +1,9 @@
-import { useState, useEffect } from 'react'
-import { Button } from "@/components/ui/button"
-import {
-  Dialog,
-  DialogContent,
-  DialogDescription,
-  DialogFooter,
-  DialogHeader,
-  DialogTitle,
-} from "@/components/ui/dialog"
+import * as React from "react"
+import { useState, useEffect } from "react"
+import { Dialog, DialogOverlay, DialogContent, DialogTitle } from "@/components/ui/dialog"
 import { RadioGroup, RadioGroupItem } from "@/components/ui/radio-group"
 import { Label } from "@/components/ui/label"
+import axios from "axios"
 
 interface Question {
   id: number;
@@ -30,76 +24,81 @@ const PersonalizationModal: React.FC<PersonalizationModalProps> = ({ isOpen, onC
   const [answers, setAnswers] = useState<Record<number, string>>({})
 
   useEffect(() => {
-    // In a real application, you would fetch these questions from your API
-    const fetchedQuestions: Question[] = [
-      {
-        id: 1,
-        text: "How do you prefer to access educational content?",
-        options: ["Tablet", "Computer", "Both", "Smartphone", "E-reader"],
-        category: "Technology Usage"
-      },
-      {
-        id: 2,
-        text: "What is your preferred method of learning?",
-        options: ["Reading", "Videos", "Interactive Quizzes", "Group Discussions", "Hands-on Projects"],
-        category: "Learning Preferences"
-      },
-      {
-        id: 3,
-        text: "How many hours a day can you dedicate to learning?",
-        options: ["1-2 hours", "3-4 hours", "5+ hours", "Less than 1 hour", "Variable depending on the day"],
-        category: "Time Management"
-      },
-      // Add more questions here...
-    ]
-    setQuestions(fetchedQuestions)
-  }, [])
+    // Fetch questions from the API
+    const fetchQuestions = async () => {
+      try {
+        const response = await axios.get('/api/questions/')
+        setQuestions(response.data)
+      } catch (error) {
+        console.error("Error fetching questions:", error.response ? error.response.data : error.message)
+      }
+    }
 
-  const handleAnswer = (answer: string) => {
-    setAnswers(prev => ({ ...prev, [questions[currentQuestionIndex].id]: answer }))
+    if (isOpen) {
+      fetchQuestions()
+    }
+  }, [isOpen])
+
+  const handleAnswerChange = (questionId: number, answer: string) => {
+    setAnswers(prevAnswers => ({
+      ...prevAnswers,
+      [questionId]: answer
+    }))
   }
 
-  const handleNext = () => {
-    if (currentQuestionIndex < questions.length - 1) {
-      setCurrentQuestionIndex(prev => prev + 1)
-    } else {
+  const handleSubmit = async () => {
+    try {
+      await axios.post('/api/user-answers/', {
+        answers: Object.entries(answers).map(([questionId, answer]) => ({
+          question: questionId,
+          answer
+        }))
+      })
       onComplete(answers)
-    }
+      onClose()
+    } catch (error) {
+      if (axios.isAxiosError(error)) {
+        console.error("Error submitting answers:", error.response ? error.response.data : error.message)
+      } else {
+        console.error("Error submitting answers:", error)
+      }
+   }
   }
 
   const currentQuestion = questions[currentQuestionIndex]
 
-  if (!currentQuestion) return null
-
   return (
     <Dialog open={isOpen} onOpenChange={onClose}>
-      <DialogContent className="sm:max-w-[425px]">
-        <DialogHeader>
-          <DialogTitle>{currentQuestion.category}</DialogTitle>
-          <DialogDescription>
-            Question {currentQuestionIndex + 1} of {questions.length}
-          </DialogDescription>
-        </DialogHeader>
-        <div className="py-4">
-          <h4 className="mb-4 text-lg font-medium">{currentQuestion.text}</h4>
-          <RadioGroup onValueChange={handleAnswer} value={answers[currentQuestion.id]}>
-            {currentQuestion.options.map((option, index) => (
-              <div key={index} className="flex items-center space-x-2">
-                <RadioGroupItem value={option} id={`option-${index}`} />
-                <Label htmlFor={`option-${index}`}>{option}</Label>
-              </div>
-            ))}
-          </RadioGroup>
-        </div>
-        <DialogFooter>
-          <Button onClick={handleNext} disabled={!answers[currentQuestion.id]}>
-            {currentQuestionIndex < questions.length - 1 ? "Next" : "Complete"}
-          </Button>
-        </DialogFooter>
+      <DialogOverlay />
+      <DialogContent>
+        <DialogTitle>Personalization Questions</DialogTitle>
+        {currentQuestion && (
+          <div>
+            <Label>{currentQuestion.text}</Label>
+            <RadioGroup
+              value={answers[currentQuestion.id] || ''}
+              onValueChange={(value) => handleAnswerChange(currentQuestion.id, value)}
+            >
+              {currentQuestion.options.map((option) => (
+                <RadioGroupItem key={option} value={option}>
+                  {option}
+                </RadioGroupItem>
+              ))}
+            </RadioGroup>
+            <button
+              onClick={() => setCurrentQuestionIndex((prevIndex) => prevIndex + 1)}
+              disabled={currentQuestionIndex >= questions.length - 1}
+            >
+              Next
+            </button>
+            {currentQuestionIndex === questions.length - 1 && (
+              <button onClick={handleSubmit}>Submit</button>
+            )}
+          </div>
+        )}
       </DialogContent>
     </Dialog>
   )
 }
 
 export default PersonalizationModal
-
