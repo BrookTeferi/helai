@@ -7,9 +7,13 @@ class RoleAdmin(admin.ModelAdmin):
     list_display = ("name",)
     search_fields = ("name",)
 
+# Register your models here with pagination
 @admin.register(User)
 class UserAdmin(admin.ModelAdmin):
+
     list_display = ("username", "role", "email")
+    list_per_page = 10
+    
     search_fields = ("username", "role", "email")
     list_filter = ("role",)
     fieldsets = (
