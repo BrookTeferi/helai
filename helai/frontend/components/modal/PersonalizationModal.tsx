@@ -30,7 +30,11 @@ const PersonalizationModal: React.FC<PersonalizationModalProps> = ({ isOpen, onC
         const response = await axios.get('/api/questions/')
         setQuestions(response.data)
       } catch (error) {
-        console.error("Error fetching questions:", error.response ? error.response.data : error.message)
+        if (axios.isAxiosError(error)) {
+          console.error("Error fetching questions:", error.response ? error.response.data : error.message)
+        } else {
+          console.error("Error fetching questions:", error)
+        }
       }
     }
 
