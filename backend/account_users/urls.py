@@ -2,6 +2,8 @@ from django.urls import path
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 from .views import OnboardingDashboardView, RegisterView, LoginView, UserDetailsView
 
+app_name = 'account_users'
+
 urlpatterns = [
     # Token-related views for JWT authentication
     path('api/token/', TokenObtainPairView.as_view(), name='token_obtain_pair'),

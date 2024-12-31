@@ -2,6 +2,7 @@ import re
 from django.contrib.auth import get_user_model, authenticate
 from rest_framework import serializers
 from rest_framework.exceptions import ValidationError
+from account_users.models import User
 
 # UserSerializer
 class UserSerializer(serializers.ModelSerializer):
@@ -16,28 +17,17 @@ class UserSerializer(serializers.ModelSerializer):
 
 # RegisterSerializer
 class RegisterSerializer(serializers.ModelSerializer):
-    """
-    Serializer for user registration.
-    """
-    password = serializers.CharField(write_only=True)
-    role = serializers.ChoiceField(choices=['STUDENT', 'INSTRUCTOR'], required=False, default='STUDENT')
-
     class Meta:
-        model = get_user_model()
-        fields = ('email', 'first_name', 'last_name', 'username', 'password', 'role')
+        model = User
+        fields = ['username', 'password', 'email', 'first_name']
+        extra_kwargs = {'password': {'write_only': True}}
 
     def create(self, validated_data):
-        """
-        Create a new user with the provided or default role.
-        """
-        role = validated_data.get('role', 'STUDENT')  # Default to 'STUDENT' if role is not provided
-        user = get_user_model().objects.create_user(
-            email=validated_data['email'],
-            password=validated_data['password'],
-            first_name=validated_data['first_name'],
-            last_name=validated_data['last_name'],
+        user = User.objects.create_user(
             username=validated_data['username'],
-            role=role
+            password=validated_data['password'],
+            email=validated_data['email'],
+            first_name=validated_data['first_name']
         )
         return user
 
