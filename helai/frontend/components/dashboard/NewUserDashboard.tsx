@@ -6,6 +6,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { CheckCircle2, Circle, HelpCircle, BookOpen, UserCircle, BrainCircuit, Layout, GraduationCap, Users, Award } from 'lucide-react'
 import Link from 'next/link'
 import Sidebar from './Sidebar'
+import PersonalizationModal from '@/components/modal/PersonalizationModal'
 
 interface DashboardProps {
   userName: string;
@@ -24,6 +25,7 @@ const stepIcons = {
 
 export default function NewUserDashboard({ userName, nextSteps, onboardingStatus, profileCompletion }: DashboardProps) {
   const [completedSteps, setCompletedSteps] = useState<string[]>([])
+  const [showPersonalizationModal, setShowPersonalizationModal] = useState(true)
 
   const toggleStep = (step: string) => {
     setCompletedSteps(prev => 
@@ -33,10 +35,22 @@ export default function NewUserDashboard({ userName, nextSteps, onboardingStatus
 
   const progress = (completedSteps.length / nextSteps.length) * 100
 
+  const handlePersonalizationComplete = (answers: Record<number, string>) => {
+    console.log("Personalization answers:", answers)
+    setShowPersonalizationModal(false)
+    // Here you would typically send these answers to your backend
+  }
+
   return (
     <div className="flex bg-gradient-to-br from-primary-50 via-secondary-50 to-primary-100 min-h-screen">
       <Sidebar />
       <div className="flex-1 p-8 overflow-auto">
+        <PersonalizationModal 
+          isOpen={showPersonalizationModal} 
+          onClose={() => setShowPersonalizationModal(false)}
+          onComplete={handlePersonalizationComplete}
+        />
+        
         <Card className="mb-8 bg-white bg-opacity-90 backdrop-blur-md shadow-xl">
           <CardHeader>
             <CardTitle className="text-3xl font-bold flex items-center heading-gradient">
