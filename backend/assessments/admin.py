@@ -21,15 +21,15 @@ class QuestionTypesAdmin(admin.ModelAdmin):
 
 @admin.register(Choice)
 class ChoiceAdmin(admin.ModelAdmin):
-    list_display = ('text', 'sub_catagory', 'created_by', 'updated_by', 'created_at', 'updated_at')
+    list_display = ('text', 'sub_category', 'created_by', 'updated_by', 'created_at', 'updated_at')
     search_fields = ('text',)
-    list_filter = ('sub_catagory', 'created_at', 'updated_at')
+    list_filter = ('sub_category', 'created_at', 'updated_at')
 
 @admin.register(Question)
 class QuestionAdmin(admin.ModelAdmin):
-    list_display = ('text', 'role', 'sub_catagory', 'question_type', 'created_by', 'updated_by', 'created_at', 'updated_at')
+    list_display = ('text', 'role', 'sub_category', 'question_type', 'created_by', 'updated_by', 'created_at', 'updated_at')
     search_fields = ('text',)
-    list_filter = ('role', 'sub_catagory', 'question_type', 'created_at', 'updated_at')
+    list_filter = ('role', 'sub_category', 'question_type', 'created_at', 'updated_at')
 
 @admin.register(UserAnswer)
 class UserAnswerAdmin(admin.ModelAdmin):
