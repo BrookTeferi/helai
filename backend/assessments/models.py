@@ -1,36 +1,97 @@
 from django.db import models
 from django.conf import settings
-from account_users.models import Role 
-
+from django.conf import settings
+from account_users.models import Role, User
 
 class Category(models.Model):
     name = models.CharField(max_length=255)
+    description = models.TextField()
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='categories_created')
+    updated_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='categories_updated')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.name
 
+    class Meta:
+        verbose_name_plural = 'Categories'
+        ordering = ['name']
+
+class SubCategory(models.Model):
+    name = models.CharField(max_length=255)
+    description = models.TextField()
+    category = models.ForeignKey(Category, on_delete=models.CASCADE)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='subcategories_created')
+    updated_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='subcategories_updated')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name_plural = 'Sub Categories'
+        ordering = ['name']
+
+class QuestionType(models.Model):
+    name = models.CharField(max_length=255)
+    description = models.TextField()
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='question_types_created')
+    updated_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='question_types_updated')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
+
+    def __str__(self):
+        return self.name
+
+    class Meta:
+        verbose_name_plural = 'Question Types'
+        ordering = ['name']
+
 class Choice(models.Model):
-    category = models.ForeignKey(Category, related_name="choices", on_delete=models.CASCADE)
+    sub_category = models.ForeignKey(SubCategory, related_name="choices", on_delete=models.CASCADE)
     text = models.CharField(max_length=255)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='choices_created')
+    updated_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='choices_updated')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return self.text
 
+    class Meta:
+        verbose_name_plural = 'Choices'
+        ordering = ['text']
+
 class Question(models.Model):
-    role = models.ForeignKey(Role, on_delete=models.CASCADE)  # Role associated with the question
-    category = models.ForeignKey(Category, on_delete=models.CASCADE)  # Category associated with the question
-    text = models.TextField()  # Question text
-    options = models.JSONField()  # JSON field for answer options
+    role = models.ForeignKey(Role, on_delete=models.CASCADE)
+    sub_category = models.ForeignKey(SubCategory, on_delete=models.CASCADE)
+    question_type = models.ForeignKey(QuestionType, on_delete=models.CASCADE)
+    text = models.TextField()
+    options = models.JSONField()
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='questions_created')
+    updated_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='questions_updated')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"{self.role} - {self.category}: {self.text[:50]}"
+        return f"{self.role} - {self.sub_category}: {self.text[:50]}"
+
+    class Meta:
+        verbose_name_plural = 'Questions'
+        ordering = ['text']
 
 class UserAnswer(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)  # Corrected user reference
-    question = models.ForeignKey(Question, on_delete=models.CASCADE)  # Link to the question being answered
-    selected_option = models.ForeignKey(Choice, null=True, blank=True, on_delete=models.SET_NULL)  # Selected choice
-    custom_answer = models.TextField(null=True, blank=True)  # Free-text answer field
-    submitted_at = models.DateTimeField(auto_now_add=True)  # Timestamp for the answer submission
+    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE, related_name='answers')
+    question = models.ForeignKey(Question, on_delete=models.CASCADE)
+    selected_option = models.ForeignKey(Choice, null=True, blank=True, on_delete=models.SET_NULL)
+    custom_answer = models.TextField(null=True, blank=True)
+    submitted_at = models.DateTimeField(auto_now_add=True)
+    created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_answers_created')
+    updated_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='user_answers_updated')
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
         return f"{self.user.username} - {self.question.text[:50]}: {self.selected_option or self.custom_answer}"
