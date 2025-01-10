@@ -1,29 +1,30 @@
 from typing import Any
 from django.core.management.base import BaseCommand
-from django.contrib.auth.models import User
+from account_users.models import User
 from assessments.models import Category, SubCategory
 
 class Command(BaseCommand):
     help = "Seed for subcategories"
+    def getuserbyrole(self):
+        user = User.objects.filter(role='admin').first()
+        if user:
+            return user
+        else:
+            return User.objects.first()
+        
+    def getcatagorybyname(self):
+        category = Category.objects.filter(name='Personalization').first()
+        if category:
+            return category
+        else:
+            return Category.objects.first()
 
     def handle(self, *args: Any, **options: Any) -> str | None:
         # Assuming user with ID 1 exists and will be used as the default user for created_by and updated_by
-        default_user = User.objects.get(pk=1)
+        default_user = self.getuserbyrole()
 
         # Ensure the "Personalization" category exists
-        category, created = Category.objects.get_or_create(
-            name="Personalization",
-            defaults={
-                "description": "Personalization",
-                "created_by": default_user,
-                "updated_by": default_user
-            }
-        )
-
-        if created:
-            self.stdout.write(self.style.SUCCESS(f"{category.name} category has been created successfully!"))
-        else:
-            self.stdout.write(self.style.WARNING(f"{category.name} category already exists!"))
+        category=self.getcatagorybyname()
 
         subcategories = [
             {"name": "Technology Usage", "description": "Usage of technology in learning"},
