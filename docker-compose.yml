@@ -23,7 +23,7 @@ services:
       - ./backend/.env
 
   frontend:
-    build: ./frontend
+    build: ./helai/frontend
     command: npm run dev
     volumes:
       - ./frontend:/app
