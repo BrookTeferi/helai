@@ -8,6 +8,13 @@ WORKDIR /app
 COPY package.json ./
 COPY package-lock.json ./
 
+# List the contents of the /app directory for debugging
+RUN ls -la /app
+
+# Increase npm timeout and use npm cache
+RUN npm config set fetch-retry-maxtimeout 120000
+RUN npm config set cache /app/.npm-cache --global
+
 # Install dependencies
 RUN npm install
 
