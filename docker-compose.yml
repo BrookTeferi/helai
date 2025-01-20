@@ -9,6 +9,7 @@ services:
       POSTGRES_DB: ${DB_NAME}
       POSTGRES_USER: ${DB_USER}
       POSTGRES_PASSWORD: ${DB_PASSWORD}
+      POSTGRES_HOST_AUTH_METHOD: trust
 
   web:
     build: ./backend
@@ -23,12 +24,12 @@ services:
       - ./backend/.env
 
   frontend:
-    build: ./helai/frontend
+    build: ./frontend
     command: npm run dev
     volumes:
       - ./frontend:/app
     ports:
-      - "8080:8080"
+      - "3000:3000"
     depends_on:
       - web
 
