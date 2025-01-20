@@ -64,3 +64,10 @@ docs/_build/
 .DS_Store
 user_*/*
 db.sqlite3
+
+
+*/migrations/*
+account_users//migrations/*
+assessments/migrations/*
+courses/migrations/*
+research/migrations/*
