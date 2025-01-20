@@ -1,8 +1,8 @@
 from django.db import models
 from django.conf import settings
-from django.conf import settings
+from django.contrib.auth import get_user_model
 from account_users.models import Role, User
-
+User = get_user_model()
 class Category(models.Model):
     name = models.CharField(max_length=255)
     description = models.TextField()
@@ -53,10 +53,8 @@ def get_default_question_type():
     return QuestionType.objects.filter(question_type='default').first()
 
 class Choice(models.Model):
-    sub_category = models.ForeignKey(SubCategory, related_name="choices", on_delete=models.CASCADE)
-    question_type = models.ForeignKey(QuestionType, on_delete=models.CASCADE, default=get_default_question_type)
     text = models.CharField(max_length=255)
-    answer=models.CharField(max_length=255,null=True, blank=True)
+    question_type = models.ForeignKey(QuestionType, on_delete=models.CASCADE, related_name='choices')
     created_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='choices_created')
     updated_by = models.ForeignKey(User, on_delete=models.CASCADE, related_name='choices_updated')
     created_at = models.DateTimeField(auto_now_add=True)

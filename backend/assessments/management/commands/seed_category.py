@@ -35,4 +35,9 @@ class Command(BaseCommand):
             else:
                 self.stdout.write(self.style.WARNING(f"{category.name} already exists!"))
 
-        self.stdout.write(self.style.SUCCESS("Categories have been seeded successfully!"))
+            if created:
+                self.stdout.write(self.style.SUCCESS(f"{category.name} has been seeded successfully!"))
+            else:
+                self.stdout.write(self.style.WARNING(f"{category.name} already exists!"))
+
+        self.stdout.write(self.style.SUCCESS("Categories have b have beeneen seeded successfully!"))

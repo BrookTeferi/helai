@@ -21,9 +21,9 @@ class QuestionTypesAdmin(admin.ModelAdmin):
 
 @admin.register(Choice)
 class ChoiceAdmin(admin.ModelAdmin):
-    list_display = ('text', 'sub_category', 'created_by', 'updated_by', 'created_at', 'updated_at')
-    search_fields = ('text',)
-    list_filter = ('sub_category', 'created_at', 'updated_at')
+    list_display = ('text', 'question_type', 'created_by', 'updated_by', 'created_at', 'updated_at')
+    list_filter = ('question_type', 'created_by', 'updated_by', 'created_at', 'updated_at')
+
 
 @admin.register(Question)
 class QuestionAdmin(admin.ModelAdmin):
